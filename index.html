@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+ 
+
+
+
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aagaur - By Yangad's</title>
+  <meta name="description" content="At Aagaur, we reimagine commercial spaces with creativity, precision, and purpose. Specializing in Design & Build and General Contracting with 20 years of experience.">
+  <meta name="keywords" content="commercial design, office design, retail space, construction, bangalore">
+  
+  <!-- Open Graph tags for social sharing -->
+  <meta property="og:title" content="Aagaur - By Yangad's">
+  <meta property="og:description" content="Reimagining commercial spaces with creativity, precision, and purpose">
+  <meta property="og:url" content="https://www.yangadsartgallery.in/">
+  <meta property="og:type" content="website">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // Check if we need to redirect to a specific path
+      (function() {
+        const redirect = sessionStorage.getItem('redirect');
+        if (redirect) {
+          sessionStorage.removeItem('redirect');
+          if (redirect !== location.pathname) {
+            history.replaceState(null, null, redirect);
+          }
+        }
+      })();
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://www.yangadsartgallery.in/",
+  "name": "Aagaur",
+  "url": "https://www.yangadsartgallery.in/",
+  "logo": "https://www.yangadsartgallery.in/logo.png",
+  "description": "Reimagining commercial spaces with creativity, precision, and purpose. Specializing in Design & Build and General Contracting.",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "72/12, Nallurahalli Main Rd, Near Shell Petrol Pump",
+    "addressLocality": "Bangalore",
+    "addressCountry": "India"
+  },
+  "telephone": "+91 96060 64203",
+  "email": "connect@futureal.in",
+  "founder": {
+    "@type": "Person",
+    "name": "Abhishek Kumar",
+    "jobTitle": "Founder & CEO",
+  }
+}
+</script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
