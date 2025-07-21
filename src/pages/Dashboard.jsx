@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { apiFetch } from '../utils/api';
 
 const Dashboard = () => {
@@ -8,34 +9,66 @@ const Dashboard = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const products = await apiFetch('/products');
-        const offers = await apiFetch('/offers');
-        const orders = await apiFetch('/orders');
-        setStats({ products: products.length, offers: offers.length, orders: orders.length });
+        const [projects, events, videos] = await Promise.all([
+          apiFetch('/projects'),
+          apiFetch('/events'),
+          apiFetch('/videos'),
+        ]);
+        setStats({
+          projects: projects.length,
+          events: events.length,
+          videos: videos.length,
+        });
       } catch (err) {
-        setError(err.message);
+        setError(err.message || 'Failed to load stats');
       }
     };
     load();
   }, []);
 
-  if (error) return <div className="text-red-500">{error}</div>;
-  if (!stats) return <div>Loading...</div>;
+  if (error) return <div className="text-red-500 p-4">{error}</div>;
+  if (!stats) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-      <StatCard label="Products" value={stats.products} />
-      <StatCard label="Offers" value={stats.offers} />
-      <StatCard label="Orders" value={stats.orders} />
+    <div className="p-4 max-w-6xl mx-auto">
+      <h1 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-white">Dashboard</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatItem 
+          label="Projects" 
+          value={stats.projects} 
+          to="/admin/manage-projects" 
+          icon="📋"
+        />
+        <StatItem 
+          label="Events" 
+          value={stats.events} 
+          to="/admin/manage-events" 
+          icon="🎉"
+        />
+        <StatItem 
+          label="Videos" 
+          value={stats.videos} 
+          to="/admin/manage-films" 
+          icon="🎥"
+        />
+      </div>
     </div>
   );
 };
 
-const StatCard = ({ label, value }) => (
-  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-    <div className="text-3xl font-bold mb-2">{value}</div>
-    <div className="text-gray-600 dark:text-gray-400">{label}</div>
-  </div>
+const StatItem = ({ label, value, to, icon }) => (
+  <Link
+    to={to}
+    className="block bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg transition-all p-6 cursor-pointer hover:scale-[1.02]"
+  >
+    <div className="flex items-center">
+      <div className="text-4xl mr-4">{icon}</div>
+      <div className="text-left">
+        <div className="text-3xl font-bold text-gray-900 dark:text-white">{value}</div>
+        <div className="text-gray-500 dark:text-gray-400 text-sm font-medium">{label}</div>
+      </div>
+    </div>
+  </Link>
 );
 
 export default Dashboard;
