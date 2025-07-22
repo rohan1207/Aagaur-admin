@@ -109,7 +109,7 @@ const EventForm = ({ event, onSave, onCancel }) => {
 
           <div className="flex justify-end space-x-4 pt-4">
             <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save Event</button>
+            <button type="submit" className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700">Save Event</button>
           </div>
         </form>
       </div>
@@ -210,7 +210,7 @@ const ManageEvents = () => {
             setEditingEvent(null);
             setIsModalOpen(true);
           }}
-          className="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300"
+          className="bg-amber-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-amber-700 transition-colors duration-300"
         >
           Add New Event
         </button>
@@ -250,12 +250,12 @@ const ManageEvents = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-2">
                       {event.categories.map(cat => (
-                        <span key={cat} className="px-2 py-1 text-xs font-semibold text-indigo-800 bg-indigo-100 rounded-full">{cat}</span>
+                        <span key={cat} className="px-2 py-1 text-xs font-semibold text-amber-800 bg-amber-100 rounded-full">{cat}</span>
                       ))}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => handleEdit(event)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                    <button onClick={() => handleEdit(event)} className="text-amber-600 hover:text-amber-900 mr-4">Edit</button>
                     <button onClick={() => handleDelete(event._id)} className="text-red-600 hover:text-red-900">Delete</button>
                   </td>
                 </tr>

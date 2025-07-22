@@ -138,7 +138,7 @@ const ProjectFormModal = ({ project, onSave, onCancel, isLoading }) => {
 
           <div className="flex justify-end space-x-4 pt-4">
             <button type="button" onClick={onCancel} className="px-6 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
-            <button type="submit" disabled={isLoading} className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center">
+            <button type="submit" disabled={isLoading} className="px-6 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 flex items-center">
               {isLoading && <Loader2 className="w-5 h-5 animate-spin mr-2" />} Save Changes
             </button>
           </div>
@@ -248,7 +248,7 @@ const ManageProject = () => {
             <button 
               key={cat}
               onClick={() => setCategoryFilter(cat)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium ${categoryFilter === cat ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}>
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${categoryFilter === cat ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700'}`}>
               {cat}
             </button>
           ))}
@@ -278,10 +278,10 @@ const ManageProject = () => {
             {filteredProjects.map(project => (
               <tr key={project._id}>
                 <td className="px-6 py-4 whitespace-nowrap"><div className="font-semibold">{project.title}</div><div className="text-sm text-gray-500">{project.subtitle}</div></td>
-                                <td className="px-6 py-4"><span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{project.category}</span></td>
+                                <td className="px-6 py-4"><span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">{project.category}</span></td>
                 <td className="px-6 py-4">{project.year}</td>
                 <td className="px-6 py-4 text-right">
-                  <button onClick={() => handleEdit(project)} className="text-indigo-600 hover:text-indigo-900 mr-4"><Edit className="w-5 h-5" /></button>
+                  <button onClick={() => handleEdit(project)} className="text-amber-600 hover:text-amber-900 mr-4"><Edit className="w-5 h-5" /></button>
                   <button onClick={() => handleDelete(project._id)} className="text-red-600 hover:text-red-900"><Trash2 className="w-5 h-5" /></button>
                 </td>
               </tr>

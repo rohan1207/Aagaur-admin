@@ -92,7 +92,7 @@ const AddOpeningModal = ({ onClose, onSave, isSaving }) => {
           <button
             type="submit"
             disabled={isSaving}
-            className={`w-full py-3 rounded text-white ${isSaving ? 'bg-gray-400' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+            className={`w-full py-3 rounded text-white ${isSaving ? 'bg-gray-400' : 'bg-amber-600 hover:bg-amber-700'}`}
           >
             {isSaving ? 'Saving...' : 'Save'}
           </button>
@@ -169,7 +169,7 @@ const ManageCareers = () => {
         <h1 className="text-3xl font-bold">Manage Job Openings</h1>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          className="flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700"
         >
           <PlusCircle className="w-5 h-5" /> Add Opening
         </button>
@@ -213,7 +213,7 @@ const ManageCareers = () => {
                 <td className="px-6 py-4 text-right">
                   <button
                     onClick={() => handleToggle(o._id)}
-                    className="text-indigo-600 hover:text-indigo-900"
+                    className="text-amber-600 hover:text-amber-900"
                     title="Toggle Open/Closed"
                   >
                     {o.isOpen ? <ToggleRight className="w-6 h-6" /> : <ToggleLeft className="w-6 h-6" />}
