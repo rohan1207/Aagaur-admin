@@ -25,8 +25,8 @@ const AddOpeningModal = ({ onClose, onSave, isSaving }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-8 relative">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 sm:p-8 relative">
         <button
           className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
           onClick={onClose}
@@ -164,9 +164,9 @@ const ManageCareers = () => {
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
 
   return (
-    <div className="container mx-auto p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Manage Job Openings</h1>
+    <div className="container mx-auto p-4 sm:p-8 mt-10">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">Manage Job Openings</h1>
         <button
           onClick={() => setShowAddModal(true)}
           className="flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700"
@@ -183,8 +183,8 @@ const ManageCareers = () => {
         />
       )}
 
-      <div className="bg-white shadow rounded-lg overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="bg-white shadow rounded-lg overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200 hidden md:table">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Position</th>
@@ -199,7 +199,7 @@ const ManageCareers = () => {
               <tr key={o._id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="font-medium text-gray-900">{o.position}</div>
-                  <div className="text-sm text-gray-500">{o.shortDescription}</div>
+                  <div className="text-sm text-gray-500 truncate max-w-xs">{o.shortDescription}</div>
                 </td>
                 <td className="px-6 py-4">{o.location || '-'}</td>
                 <td className="px-6 py-4">{o.employmentType}</td>
@@ -223,6 +223,41 @@ const ManageCareers = () => {
             ))}
           </tbody>
         </table>
+
+        {/* Mobile Card View */}
+        <div className="divide-y divide-gray-200 md:hidden">
+          {openings.map((o) => (
+            <div key={o._id} className="p-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="font-bold text-lg">{o.position}</div>
+                  <p className="text-sm text-gray-600 mt-1">{o.shortDescription}</p>
+                </div>
+                <button
+                  onClick={() => handleToggle(o._id)}
+                  className="text-amber-600 hover:text-amber-900 flex-shrink-0 ml-4 p-1"
+                  title="Toggle Open/Closed"
+                >
+                  {o.isOpen ? <ToggleRight className="w-6 h-6" /> : <ToggleLeft className="w-6 h-6" />}
+                </button>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 items-center text-sm">
+                <span className="font-medium">Status:</span>
+                {o.isOpen ? (
+                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Open</span>
+                ) : (
+                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-200 text-gray-600">Closed</span>
+                )}
+                <span className="text-gray-500">|</span>
+                <span className="font-medium">Type:</span>
+                <span>{o.employmentType}</span>
+                <span className="text-gray-500">|</span>
+                <span className="font-medium">Location:</span>
+                <span>{o.location || '-'}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -74,8 +74,8 @@ const EventForm = ({ event, onSave, onCancel }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+      <div className="bg-white p-6 sm:p-8 rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-6">{event ? 'Edit Event' : 'Add New Event'}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Event Title" className="w-full p-2 border rounded" required />
@@ -202,9 +202,9 @@ const ManageEvents = () => {
   if (error) return <div className="flex justify-center items-center h-screen"><div className="text-xl text-red-500">Error: {error}</div></div>;
 
   return (
-    <div className="container mx-auto p-8 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-800">Manage Events</h1>
+    <div className="container mx-auto p-4 sm:p-8 bg-gray-50 min-h-screen mt-10">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-8 gap-4">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">Manage Events</h1>
         <button
           onClick={() => {
             setEditingEvent(null);
@@ -227,8 +227,8 @@ const ManageEvents = () => {
         />
       )}
 
-      <div className="bg-white shadow-xl rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="bg-white shadow-xl rounded-lg overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 hidden md:table">
           <thead className="bg-gray-100">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
@@ -269,6 +269,35 @@ const ManageEvents = () => {
             )}
           </tbody>
         </table>
+
+        {/* Mobile Card View */}
+        <div className="divide-y divide-gray-200 md:hidden">
+          {events.length > 0 ? (
+            events.map(event => (
+              <div key={event._id} className="p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="font-bold text-lg text-gray-900">{event.title}</div>
+                    <div className="text-sm text-gray-600 mt-1">{new Date(event.date).toLocaleDateString()}</div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                    <button onClick={() => handleEdit(event)} className="text-amber-600 hover:text-amber-900 p-1">Edit</button>
+                    <button onClick={() => handleDelete(event._id)} className="text-red-600 hover:text-red-900 p-1">Delete</button>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {event.categories.map(cat => (
+                    <span key={cat} className="px-2 py-1 text-xs font-semibold text-amber-800 bg-amber-100 rounded-full">{cat}</span>
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="px-6 py-12 text-center text-gray-500">
+              No events found. Add one to get started!
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

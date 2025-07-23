@@ -197,7 +197,7 @@ const AddProject = () => {
 
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800">
+    <div className="min-h-screen bg-slate-50 text-slate-800 mt-10">
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-slate-800 mb-6">Add New Project</h1>
 

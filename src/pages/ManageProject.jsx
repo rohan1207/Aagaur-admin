@@ -106,8 +106,8 @@ const ProjectFormModal = ({ project, onSave, onCancel, isLoading }) => {
   if (!project) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-4xl max-h-[95vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+      <div className="bg-white p-6 sm:p-8 rounded-lg shadow-2xl w-full max-w-md sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-3xl font-bold mb-6">Edit Project</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* All fields from AddProject.jsx */}
@@ -229,11 +229,11 @@ const ManageProject = () => {
   if (error) return <div className="text-center py-10 text-red-500">Error: {error}</div>;
 
   return (
-    <div className="container mx-auto p-8">
-      <h1 className="text-4xl font-bold mb-8">Manage Projects</h1>
+    <div className="container mx-auto p-4 sm:p-8 mt-10">
+      <h1 className="text-3xl sm:text-4xl font-bold mb-8">Manage Projects</h1>
 
-      <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow">
-        <div className="relative w-1/2">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-lg shadow gap-4">
+        <div className="relative w-full sm:w-1/2">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input 
             type="text"
@@ -243,7 +243,7 @@ const ManageProject = () => {
             className="w-full p-2 pl-10 border rounded-lg"
           />
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 flex-wrap justify-center">
           {['All', 'Architecture', 'Interior'].map(cat => (
             <button 
               key={cat}
@@ -264,8 +264,9 @@ const ManageProject = () => {
         />
       )}
 
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="bg-white shadow-lg rounded-lg overflow-x-auto">
+        {/* Desktop Table View */}
+        <table className="min-w-full divide-y divide-gray-200 hidden md:table">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project</th>
@@ -277,8 +278,13 @@ const ManageProject = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredProjects.map(project => (
               <tr key={project._id}>
-                <td className="px-6 py-4 whitespace-nowrap"><div className="font-semibold">{project.title}</div><div className="text-sm text-gray-500">{project.subtitle}</div></td>
-                                <td className="px-6 py-4"><span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">{project.category}</span></td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="font-semibold">{project.title}</div>
+                  <div className="text-sm text-gray-500 truncate">{project.subtitle}</div>
+                </td>
+                <td className="px-6 py-4">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">{project.category}</span>
+                </td>
                 <td className="px-6 py-4">{project.year}</td>
                 <td className="px-6 py-4 text-right">
                   <button onClick={() => handleEdit(project)} className="text-amber-600 hover:text-amber-900 mr-4"><Edit className="w-5 h-5" /></button>
@@ -288,6 +294,28 @@ const ManageProject = () => {
             ))}
           </tbody>
         </table>
+
+        {/* Mobile Card View */}
+        <div className="divide-y divide-gray-200 md:hidden">
+          {filteredProjects.map(project => (
+            <div key={project._id} className="p-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="font-bold text-lg">{project.title}</div>
+                  <div className="text-sm text-gray-500">{project.subtitle}</div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                  <button onClick={() => handleEdit(project)} className="text-amber-600 hover:text-amber-900 p-1"><Edit className="w-5 h-5" /></button>
+                  <button onClick={() => handleDelete(project._id)} className="text-red-600 hover:text-red-900 p-1"><Trash2 className="w-5 h-5" /></button>
+                </div>
+              </div>
+              <div className="mt-4 flex justify-between items-center text-sm">
+                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">{project.category}</span>
+                <span className="text-gray-600">{project.year}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
