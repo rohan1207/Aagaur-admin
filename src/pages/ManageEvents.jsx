@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-const EventForm = ({ event, onSave, onCancel }) => {
+const EventForm = ({ event, onSave, onCancel, isSaving }) => {
   const [formData, setFormData] = useState(() => {
     const initialData = {
       title: '',
@@ -109,7 +109,17 @@ const EventForm = ({ event, onSave, onCancel }) => {
 
           <div className="flex justify-end space-x-4 pt-4">
             <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700">Save Event</button>
+            <button type="submit" disabled={isSaving} className="px-4 py-2 rounded text-white bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 flex items-center justify-center">
+              {isSaving ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {event ? 'Updating...' : 'Saving...'}
+                </>
+              ) : (event ? 'Update Event' : 'Save Event')}
+            </button>
           </div>
         </form>
       </div>
@@ -123,6 +133,7 @@ const ManageEvents = () => {
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const fetchEvents = async () => {
     try {
@@ -143,32 +154,58 @@ const ManageEvents = () => {
   }, []);
 
   const handleSave = async (eventData) => {
+    setIsSaving(true);
+    setError(null);
+    console.log('Attempting to save event...');
+
+    // Log FormData contents
+    for (let [key, value] of eventData.entries()) {
+      console.log(`${key}:`, value);
+    }
+
     const token = localStorage.getItem('adminToken');
-    console.log('Auth Token being sent:', token);
     const method = editingEvent ? 'PUT' : 'POST';
     const url = editingEvent
       ? `${API_BASE}/events/${editingEvent._id}`
       : `${API_BASE}/events`;
 
+    console.log(`Sending ${method} request to ${url}`);
+
     try {
-      const res = await fetch(url, {
-        method,
+      const response = await fetch(url, {
+        method: method,
         headers: {
           'Authorization': `Bearer ${token}`,
         },
         body: eventData,
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to save event');
+      const responseBody = await response.text(); // Read body as text to avoid JSON parsing errors on non-JSON responses
+      console.log('Response Status:', response.status);
+      console.log('Response Body:', responseBody);
+
+      if (!response.ok) {
+        let errorPayload = null;
+        try {
+          errorPayload = JSON.parse(responseBody); // Try to parse as JSON
+        } catch (e) {
+          // Not a JSON response
+        }
+        const errorMessage = errorPayload?.message || `HTTP error! Status: ${response.status}`;
+        console.error('Save failed:', errorMessage);
+        throw new Error(errorMessage);
       }
 
+      console.log('Event saved successfully');
       setIsModalOpen(false);
       setEditingEvent(null);
       fetchEvents(); // Refresh the list
     } catch (err) {
+      console.error('An error occurred during save:', err);
       setError(err.message);
+    } finally {
+      setIsSaving(false);
+      console.log('Save attempt finished.');
     }
   };
 
@@ -219,6 +256,7 @@ const ManageEvents = () => {
       {isModalOpen && (
         <EventForm
           event={editingEvent}
+          isSaving={isSaving}
           onSave={handleSave}
           onCancel={() => {
             setIsModalOpen(false);

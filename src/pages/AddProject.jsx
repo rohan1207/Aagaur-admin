@@ -138,9 +138,10 @@ const AddProject = () => {
 
     // Allow up to 5 minutes for large uploads before aborting
     const timeoutMs = 5 * 60 * 1000; // 300 000 ms
+    console.log('Starting upload with a timeout...');
     const timeoutId = setTimeout(() => {
-      console.warn(`Upload aborted after ${timeoutMs / 1000}s timeout`);
       controller.abort();
+      console.log(`Upload aborted after ${timeoutMs / 1000}s timeout`);
     }, timeoutMs);
 
     const fd = new FormData();
@@ -162,6 +163,8 @@ const AddProject = () => {
     try {
       const token = localStorage.getItem('adminToken');
       console.log('Submitting project...');
+      console.log('Sending POST request to /api/projects...');
+      console.log('FormData content:', fd.get('title')); // Log a sample field
 
       const res = await fetch(`${API_BASE}/projects`, {
         method: 'POST',
@@ -190,6 +193,9 @@ const AddProject = () => {
         showSweetAlert('error', err.message || 'Failed to add project.');
       }
       console.error('Project add error:', err);
+      if (err.name === 'AbortError') {
+        console.error('This timeout error suggests the backend is not responding in time. The request was cancelled by the frontend.');
+      }
     } finally {
       setIsLoading(false);
     }
