@@ -21,7 +21,7 @@ const EventForm = ({ event, onSave, onCancel, isSaving }) => {
   const [mainImageFile, setMainImageFile] = useState(null);
   const [galleryImageFiles, setGalleryImageFiles] = useState([]);
 
-  const categoriesList = ['Sustainable Architecture', 'Workshop', 'Construction', 'Earth Building'];
+  const categoriesList = ['Sustainable Architecture', 'Workshop', 'Construction', 'Earth Building','events'];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
