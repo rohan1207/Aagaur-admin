@@ -238,8 +238,20 @@ const ManageProject = () => {
       clearTimeout(timeoutId);
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to update project');
+        let errorMsg = `Server responded with status: ${res.status}`;
+        try {
+          const errorText = await res.text();
+          console.error("Raw server error response:", errorText);
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMsg = errorData.message || JSON.stringify(errorData);
+          } catch (e) {
+            errorMsg = errorText;
+          }
+        } catch (e) {
+          // Could not read response body
+        }
+        throw new Error(errorMsg);
       }
       const updatedProject = await res.json();
       setProjects(projects.map(p => p._id === id ? updatedProject : p));
@@ -247,10 +259,11 @@ const ManageProject = () => {
       setEditingProject(null);
     } catch (err) {
       clearTimeout(timeoutId);
+      console.error('An error occurred during the update:', err);
       if (err.name === 'AbortError') {
         setError('The request timed out. Please check your connection and try again.');
       } else {
-        setError(err.message);
+        setError(err.message || 'An unknown error occurred.');
       }
     } finally {
       setLoading(false);
