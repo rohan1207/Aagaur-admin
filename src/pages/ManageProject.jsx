@@ -114,16 +114,40 @@ const ProjectFormModal = ({ project, onSave, onCancel, isLoading }) => {
           <input type="text" name="title" value={form.title || ''} onChange={handleChange} placeholder="Project Title" className="w-full p-3 border rounded" required />
           <input type="text" name="subtitle" value={form.subtitle || ''} onChange={handleChange} placeholder="Subtitle" className="w-full p-3 border rounded" />
           <input type="text" name="location" value={form.location || ''} onChange={handleChange} placeholder="Location" className="w-full p-3 border rounded" />
+          <input type="text" name="projectType" value={form.projectType || ''} onChange={handleChange} placeholder="Project Type" className="w-full p-3 border rounded" />
           <input type="text" name="client" value={form.client || ''} onChange={handleChange} placeholder="Client" className="w-full p-3 border rounded" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <select name="category" value={form.category || ''} onChange={handleChange} className="w-full p-3 border rounded"><option value="" disabled>Category</option><option value="Architecture">Architecture</option><option value="Interior">Interior</option></select>
+            <select name="category" value={form.category || ''} onChange={handleChange} className="w-full p-3 border rounded"><option value="" disabled>Category</option><option value="Architecture">Architecture</option><option value="Interior">Interior</option></select>
             <select name="status" value={form.status || ''} onChange={handleChange} className="w-full p-3 border rounded"><option value="Completed">Completed</option><option value="Ongoing">Ongoing</option></select>
             <input type="number" name="year" value={form.year || ''} onChange={handleChange} placeholder="Year" className="w-full p-3 border rounded" />
           </div>
+
+          {/* Area */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input type="number" name="area.value" value={form.area?.value || ''} onChange={handleChange} placeholder="Area" className="w-full p-3 border rounded" />
+            <select name="area.unit" value={form.area?.unit || 'sq.ft.'} onChange={handleChange} className="w-full p-3 border rounded">
+              <option value="sq.ft.">sq.ft.</option>
+              <option value="sq.m.">sq.m.</option>
+            </select>
+          </div>
+
           <textarea name="description" value={form.description || ''} onChange={handleChange} placeholder="Description" className="w-full p-3 border rounded" rows="5" />
-          
+
           <DynamicListInput label="Key Features" field="keyFeatures" list={form.keyFeatures || []} onListChange={handleDynamicListChange} onAddItem={addDynamicListItem} onRemoveItem={removeDynamicListItem} />
           <DynamicListInput label="Materials Used" field="materialsUsed" list={form.materialsUsed || []} onListChange={handleDynamicListChange} onAddItem={addDynamicListItem} onRemoveItem={removeDynamicListItem} />
+
+          {/* SEO Tags */}
+          <DynamicListInput label="SEO Tags" field="seoTags" list={form.seoTags || []} onListChange={handleDynamicListChange} onAddItem={addDynamicListItem} onRemoveItem={removeDynamicListItem} />
+           <DynamicListInput label="SEO Tags" field="seoTags" list={form.seoTags || []} onListChange={handleDynamicListChange} onAddItem={addDynamicListItem} onRemoveItem={removeDynamicListItem} />
+
+           {/* Quote */}
+           <div className="space-y-2">
+             <label className="block text-sm font-medium text-slate-700">Quote</label>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <input type="text" name="quote.text" value={form.quote?.text || ''} onChange={handleChange} placeholder="Quote text" className="w-full p-3 border rounded" />
+               <input type="text" name="quote.author" value={form.quote?.author || ''} onChange={handleChange} placeholder="Author" className="w-full p-3 border rounded" />
+             </div>
+           </div>
           
           <div>
             <label>Main Image</label>
