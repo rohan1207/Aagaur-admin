@@ -123,8 +123,26 @@ const AddProject = () => {
 
   const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
+  // Validate all required fields before submit
+  const validateForm = () => {
+    const requiredTextFields = ['title','subtitle','location','projectType','category','status','year','description','client'];
+    for (const field of requiredTextFields) {
+      if (!form[field] || (typeof form[field]==='string' && form[field].trim()==='')) return false;
+    }
+    if (!form.area.value || !form.area.unit) return false;
+    const listFilled = (list)=> list.length && list.every(item=>item.value && item.value.trim()!=='');
+    if (!listFilled(form.keyFeatures)) return false;
+    if (!listFilled(form.materialsUsed)) return false;
+    if (!mainImage) return false;
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      showSweetAlert('error','Please fill in all required fields before submitting.');
+      return;
+    }
     if (!mainImage) {
       showSweetAlert('error', 'Main image is required.');
       return;
@@ -224,19 +242,19 @@ const AddProject = () => {
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">Subtitle</label>
-                  <input type="text" name="subtitle" value={form.subtitle} onChange={handleChange} className="w-full input" />
+                  <input type="text" name="subtitle" value={form.subtitle} onChange={handleChange} className="w-full input" required />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-slate-700">Location</label>
-                <input type="text" name="location" value={form.location} onChange={handleChange} className="w-full input" />
+                <input type="text" name="location" value={form.location} onChange={handleChange} className="w-full input" required />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">Project Type</label>
-                  <input type="text" name="projectType" value={form.projectType} onChange={handleChange} placeholder="e.g., Residential" className="w-full input" />
+                  <input type="text" name="projectType" value={form.projectType} onChange={handleChange} placeholder="e.g., Residential" className="w-full input" required />
                 </div>
 
                 <div className="space-y-2">
@@ -249,7 +267,7 @@ const AddProject = () => {
 
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">Status</label>
-                  <select name="status" value={form.status} onChange={handleChange} className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-slate-500 focus:border-slate-500">
+                  <select name="status" value={form.status} onChange={handleChange} className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-slate-500 focus:border-slate-500" required>
                     <option value="Completed">Completed</option>
                     <option value="Ongoing">Ongoing</option>
                   </select>
@@ -257,7 +275,7 @@ const AddProject = () => {
 
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">Year</label>
-                  <input type="number" name="year" value={form.year} onChange={handleChange} className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-slate-500 focus:border-slate-500" />
+                  <input type="number" name="year" value={form.year} onChange={handleChange} className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-slate-500 focus:border-slate-500" required />
                 </div>
               </div>
 
@@ -265,13 +283,13 @@ const AddProject = () => {
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">Area</label>
                   <div className="flex items-center gap-2">
-                    <input type="number" name="area.value" value={form.area.value} onChange={handleChange} className="w-full input" />
-                    <input type="text" name="area.unit" value={form.area.unit} onChange={handleChange} className="w-1/3 input" />
+                    <input type="number" name="area.value" value={form.area.value} onChange={handleChange} className="w-full input" required />
+                    <input type="text" name="area.unit" value={form.area.unit} onChange={handleChange} className="w-1/3 input" required />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">Client (Optional)</label>
-                  <input type="text" name="client" value={form.client} onChange={handleChange} className="w-full input" />
+                  <input type="text" name="client" value={form.client} onChange={handleChange} className="w-full input" required />
                 </div>
               </div>
 

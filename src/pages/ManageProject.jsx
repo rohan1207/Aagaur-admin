@@ -128,6 +128,8 @@ const ProjectFormModal = ({ project, onSave, onCancel, isLoading }) => {
             <select name="area.unit" value={form.area?.unit || 'sq.ft.'} onChange={handleChange} className="w-full p-3 border rounded">
               <option value="sq.ft.">sq.ft.</option>
               <option value="sq.m.">sq.m.</option>
+              <option value="acres">acres</option>
+              <option value="hectares">hectares</option>
             </select>
           </div>
 
