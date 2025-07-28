@@ -138,7 +138,6 @@ const ProjectFormModal = ({ project, onSave, onCancel, isLoading }) => {
 
           {/* SEO Tags */}
           <DynamicListInput label="SEO Tags" field="seoTags" list={form.seoTags || []} onListChange={handleDynamicListChange} onAddItem={addDynamicListItem} onRemoveItem={removeDynamicListItem} />
-           <DynamicListInput label="SEO Tags" field="seoTags" list={form.seoTags || []} onListChange={handleDynamicListChange} onAddItem={addDynamicListItem} onRemoveItem={removeDynamicListItem} />
 
            {/* Quote */}
            <div className="space-y-2">
@@ -222,12 +221,22 @@ const ManageProject = () => {
   const handleSave = async (formData, id) => {
     const token = localStorage.getItem('adminToken');
     setLoading(true);
+    setError('');
+
+    const controller = new AbortController();
+    const signal = controller.signal;
+    const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000); // 5-minute timeout
+
     try {
       const res = await fetch(`${API_BASE}/projects/${id}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData, // FormData sets its own Content-Type
+        signal,
       });
+
+      clearTimeout(timeoutId);
+
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Failed to update project');
@@ -237,13 +246,18 @@ const ManageProject = () => {
       setIsModalOpen(false);
       setEditingProject(null);
     } catch (err) {
-      setError(err.message);
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        setError('The request timed out. Please check your connection and try again.');
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-    const filteredProjects = useMemo(() => {
+  const filteredProjects = useMemo(() => {
     return projects
       .filter(p => categoryFilter === 'All' || p.category === categoryFilter)
       .filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()));
