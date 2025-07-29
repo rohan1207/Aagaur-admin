@@ -12,6 +12,7 @@ import ManageEvents from './pages/ManageEvents';
 const ManageProjects = React.lazy(() => import('./pages/ManageProject'));
 const ManageCareers = React.lazy(() => import('./pages/ManageCareers'));
 const ManageFilms = React.lazy(() => import('./pages/ManageFilms'));
+const ManageTeam = React.lazy(() => import('./pages/ManageTeam'));
 const App = () => (
   <Router>
     <Routes>
@@ -36,6 +37,7 @@ const App = () => (
         <Route path="manage-events" element={<ManageEvents />} />
         <Route path="manage-careers" element={<ManageCareers />} />
         <Route path="manage-films" element={<ManageFilms />} />
+        <Route path="manage-team" element={<ManageTeam />} />
 
       </Route>
     </Routes>

@@ -16,7 +16,8 @@ const links = [
   { to: "/admin/manage-projects", label: "Manage Projects", icon: <FiGrid /> },
   {to:"/admin/manage-events", label:"Manage Events", icon:<FiGrid/>},
   {to:"/admin/manage-careers", label:"Manage Careers", icon:<FiGrid/>},
-  {to:"/admin/manage-films", label:"Manage Films", icon:<FiGrid/>}
+  {to:"/admin/manage-films", label:"Manage Films", icon:<FiGrid/>},
+  {to:"/admin/manage-team", label:"Manage Team", icon:<FiGrid/>},
   
 ];
 

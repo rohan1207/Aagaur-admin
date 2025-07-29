@@ -21,6 +21,18 @@ const VideoIcon = () => (
   </svg>
 );
 
+const InternIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7-7h14a7 7 0 00-7 7z" />
+  </svg>
+);
+
+const TeamIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7-7h14a7 7 0 00-7 7z" />
+  </svg>
+);  
+
 const StatItem = ({ label, value, to, icon }) => (
   <Link
     to={to}
@@ -45,15 +57,19 @@ const Dashboard = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const [projects, events, videos] = await Promise.all([
+        const [projects, events, videos, interns, team] = await Promise.all([
           apiFetch('/projects'),
           apiFetch('/events'),
           apiFetch('/videos'),
+          apiFetch('/team/interns'),
+          apiFetch('/team/members'),
         ]);
         setStats({
           projects: projects.length,
           events: events.length,
           videos: videos.length,
+          interns: interns.length,
+          team: team.length,
         });
       } catch (err) {
         setError(err.message || 'Failed to load stats');
@@ -86,6 +102,19 @@ const Dashboard = () => {
           value={stats.videos} 
           to="/admin/manage-films" 
           icon={<VideoIcon />}
+        />
+
+        <StatItem 
+          label="Interns" 
+          value={stats.interns} 
+          to="/admin/manage-interns" 
+          icon={<InternIcon />}
+        />
+        <StatItem 
+          label="Team Members" 
+          value={stats.team} 
+          to="/admin/manage-team" 
+          icon={<TeamIcon />}
         />
       </div>
     </div>
