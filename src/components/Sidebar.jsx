@@ -7,6 +7,7 @@ import {
   FiMenu,
   FiX,
   FiLogOut,
+  FiCalendar, FiBriefcase, FiFilm, FiUsers,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -14,11 +15,10 @@ const links = [
   { to: "/admin", label: "Dashboard", icon: <FiHome /> },
   { to: "/admin/add-project", label: "Add Project", icon: <FiPlusCircle /> },
   { to: "/admin/manage-projects", label: "Manage Projects", icon: <FiGrid /> },
-  {to:"/admin/manage-events", label:"Manage Events", icon:<FiGrid/>},
-  {to:"/admin/manage-careers", label:"Manage Careers", icon:<FiGrid/>},
-  {to:"/admin/manage-films", label:"Manage Films", icon:<FiGrid/>},
-  {to:"/admin/manage-team", label:"Manage Team", icon:<FiGrid/>},
-  
+  { to: "/admin/manage-events", label: "Manage Events", icon: <FiCalendar /> },
+  { to: "/admin/manage-careers", label: "Manage Careers", icon: <FiBriefcase /> },
+  { to: "/admin/manage-films", label: "Manage Films", icon: <FiFilm /> },
+  { to: "/admin/manage-team", label: "Manage Team", icon: <FiUsers /> },
 ];
 
 const Sidebar = () => {
