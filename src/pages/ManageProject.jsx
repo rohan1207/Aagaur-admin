@@ -221,6 +221,7 @@ const ProjectFormModal = ({ project, onSave, onCancel, isLoading }) => {
 
 const ManageProject = () => {
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
   const [error, setError] = useState('');
