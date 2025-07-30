@@ -1,22 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import imageCompression from 'browser-image-compression';
+import { compressImage } from '../utils/compressImage';
 
-// helper to compress images in browser
-const compressImage = async (file) => {
-  const options = {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1920,
-    useWebWorker: true,
-  };
-  try {
-    const compressed = await imageCompression(file, options);
-    console.log(`Compressed ${file.name}: ${(file.size/1024/1024).toFixed(2)}MB -> ${(compressed.size/1024/1024).toFixed(2)}MB`);
-    return compressed;
-  } catch (err) {
-    console.error('Compression failed', err);
-    return file; // fallback
-  }
-};
+
 import { Loader2, Edit, Trash2, Search, X, PlusCircle } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
