@@ -43,6 +43,7 @@ const compressImage = async (file) => {
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 const EventForm = ({ event, onSave, onCancel, isSaving }) => {
+  const [isCompressing, setIsCompressing] = useState(false);
   const [formData, setFormData] = useState(() => {
     const initialData = {
       title: '',

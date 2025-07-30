@@ -50,6 +50,7 @@ const DynamicListInput = React.memo(({ label, field, list, onListChange, onAddIt
 
 const ProjectFormModal = ({ project, onSave, onCancel, isLoading }) => {
   const [form, setForm] = useState({});
+  const [isCompressing, setIsCompressing] = useState(false);
   const [mainImage, setMainImage] = useState(null);
   const [galleryImages, setGalleryImages] = useState([]);
 
