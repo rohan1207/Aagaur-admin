@@ -1,4 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import imageCompression from 'browser-image-compression';
+
+const compressImage = async (file) => {
+  const opts = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
+  try {
+    const c = await imageCompression(file, opts);
+    console.log(`Compressed ${file.name}: ${(file.size/1024/1024).toFixed(2)}MB -> ${(c.size/1024/1024).toFixed(2)}MB`);
+    return c;
+  } catch (err) {
+    console.error('compression failed', err);
+    return file;
+  }
+};
 import { Loader2, Upload, Image, PlusCircle, XCircle, CheckCircle, AlertCircle } from 'lucide-react';
 
 // Define DynamicListInput outside the AddProject component and wrap with React.memo
@@ -202,6 +215,8 @@ const AddProject = () => {
       showSweetAlert('success', 'Project added successfully!');
       setForm(initialFormState);
       setMainImage(null);
+  // reset galleryImages too
+  setGalleryImages([]);
       setGalleryImages([]);
     } catch (err) {
       clearTimeout(timeoutId);
@@ -328,7 +343,7 @@ const AddProject = () => {
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">Main Image*</label>
                   <div className="relative">
-                    <input type="file" accept="image/*" onChange={(e) => setMainImage(e.target.files[0])} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required />
+                    <input type="file" accept="image/*" onChange={async (e)=>{ if(!e.target.files?.length) return; const comp=await compressImage(e.target.files[0]); setMainImage(comp); }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required />
                     <div className="flex items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50 hover:bg-slate-100">
                       <div className="text-center">
                         <Image className="mx-auto h-8 w-8 text-slate-400 mb-2" />
@@ -341,7 +356,7 @@ const AddProject = () => {
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">Gallery Images</label>
                   <div className="relative">
-                    <input type="file" multiple accept="image/*" onChange={(e) => setGalleryImages(Array.from(e.target.files))} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                    <input type="file" multiple accept="image/*" onChange={async (e)=>{ const files=Array.from(e.target.files||[]); if(!files.length) return; const compressed=await Promise.all(files.map(f=>compressImage(f))); setGalleryImages(compressed); }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                     <div className="flex items-center justify-center w-full h-24 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50 hover:bg-slate-100">
                       <div className="text-center">
                         <Upload className="mx-auto h-8 w-8 text-slate-400 mb-2" />

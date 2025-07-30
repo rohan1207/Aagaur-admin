@@ -1,4 +1,44 @@
 import React, { useState, useEffect } from 'react';
+import imageCompression from 'browser-image-compression';
+
+// --- Image Compression Logic ---
+// This function takes a file, compresses it, and returns the compressed file.
+const compressImage = async (file) => {
+  const options = {
+    maxSizeMB: 1,          // Max file size in MB
+    maxWidthOrHeight: 1920, // Max width or height
+    useWebWorker: true,    // Use web worker for better performance
+  };
+
+  try {
+    console.log(`Original file size: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
+    const compressedFile = await imageCompression(file, options);
+    console.log(`Compressed file size: ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`);
+    return compressedFile;
+  } catch (error) {
+    console.error('Image compression failed:', error);
+    return file; // Return original file if compression fails
+  }
+};
+
+// --- HOW TO USE ---
+// In your file input's onChange handler, you would do something like this:
+/*
+  const handleFileChange = async (event) => {
+    const { name, files } = event.target;
+    if (files && files.length > 0) {
+      // For a single file input
+      const compressedFile = await compressImage(files[0]);
+      setFormData(prevState => ({ ...prevState, [name]: compressedFile }));
+
+      // For a multiple file input
+      const compressedFiles = await Promise.all(
+        Array.from(files).map(file => compressImage(file))
+      );
+      setFormData(prevState => ({ ...prevState, [name]: compressedFiles }));
+    }
+  };
+*/
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -38,11 +78,19 @@ const EventForm = ({ event, onSave, onCancel, isSaving }) => {
     });
   };
 
-  const handleFileChange = (e) => {
-    if (e.target.name === 'mainImage') {
-      setMainImageFile(e.target.files[0]);
+  const handleFileChange = async (e) => {
+    const { name, files } = e.target;
+    if (!files || files.length === 0) return;
+
+    // Compress and set the files
+    if (name === 'mainImage') {
+      const compressed = await compressImage(files[0]);
+      setMainImageFile(compressed);
     } else {
-      setGalleryImageFiles(Array.from(e.target.files));
+      const compressedFiles = await Promise.all(
+        Array.from(files).map((file) => compressImage(file))
+      );
+      setGalleryImageFiles(compressedFiles);
     }
   };
 

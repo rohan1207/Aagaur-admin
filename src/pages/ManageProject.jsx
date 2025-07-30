@@ -1,4 +1,22 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import imageCompression from 'browser-image-compression';
+
+// helper to compress images in browser
+const compressImage = async (file) => {
+  const options = {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+  };
+  try {
+    const compressed = await imageCompression(file, options);
+    console.log(`Compressed ${file.name}: ${(file.size/1024/1024).toFixed(2)}MB -> ${(compressed.size/1024/1024).toFixed(2)}MB`);
+    return compressed;
+  } catch (err) {
+    console.error('Compression failed', err);
+    return file; // fallback
+  }
+};
 import { Loader2, Edit, Trash2, Search, X, PlusCircle } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -152,12 +170,21 @@ const ProjectFormModal = ({ project, onSave, onCancel, isLoading }) => {
           
           <div>
             <label>Main Image</label>
-            <input type="file" onChange={(e) => setMainImage(e.target.files[0])} className="w-full p-3 border rounded" />
+            <input type="file" onChange={async (e) => {
+                if (!e.target.files?.length) return;
+                const compressed = await compressImage(e.target.files[0]);
+                setMainImage(compressed);
+             }} className="w-full p-3 border rounded" />
             {project.mainImage && <img src={project.mainImage} alt="Main" className="w-32 h-32 object-cover mt-2"/>}
           </div>
           <div>
             <label>Gallery Images</label>
-            <input type="file" multiple onChange={(e) => setGalleryImages(Array.from(e.target.files))} className="w-full p-3 border rounded" />
+            <input type="file" multiple onChange={async (e) => {
+                const files = Array.from(e.target.files || []);
+                if (!files.length) return;
+                const compressedArr = await Promise.all(files.map(f=>compressImage(f)));
+                setGalleryImages(compressedArr);
+             }} className="w-full p-3 border rounded" />
             <div className="flex flex-wrap gap-2 mt-2">{project.galleryImages && project.galleryImages.map(img => <img key={img} src={img} alt="Gallery" className="w-20 h-20 object-cover"/>)}</div>
           </div>
 
