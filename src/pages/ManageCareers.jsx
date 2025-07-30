@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, PlusCircle, Check, X, ToggleRight, ToggleLeft } from 'lucide-react';
+import { Loader2, PlusCircle, Check, X, ToggleRight, ToggleLeft, Edit, Trash2 } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-const AddOpeningModal = ({ onClose, onSave, isSaving }) => {
-  const initial = {
+const AddOpeningModal = ({ onClose, onSave, isSaving, opening = null }) => {
+  const initial = opening ? { ...opening } : {
     position: '',
     shortDescription: '',
     location: '',
@@ -14,6 +14,13 @@ const AddOpeningModal = ({ onClose, onSave, isSaving }) => {
   };
   const [form, setForm] = useState(initial);
 
+  // keep form in sync when editing
+  useEffect(()=>{
+    if(opening){
+      setForm(opening);
+    }
+  },[opening]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
@@ -21,7 +28,7 @@ const AddOpeningModal = ({ onClose, onSave, isSaving }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(form);
+    onSave(form, opening?._id);
   };
 
   return (
@@ -107,6 +114,9 @@ const ManageCareers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingOpening, setEditingOpening] = useState(null);
+
+  const handleEdit = (opening)=>{ setEditingOpening(opening); setShowAddModal(true); };
   const [saving, setSaving] = useState(false);
 
   const fetchOpenings = async () => {
@@ -127,6 +137,15 @@ const ManageCareers = () => {
     fetchOpenings();
   }, []);
 
+  const handleDelete = async (id) => {
+    if(!window.confirm('Delete this opening?')) return;
+    try{
+      const res=await fetch(`${API_BASE}/careers/${id}`,{method:'DELETE'});
+      if(!res.ok) throw new Error('Delete failed');
+      await fetchOpenings();
+    }catch(err){alert(err.message);}  
+  };
+
   const handleToggle = async (id) => {
     try {
       const res = await fetch(`${API_BASE}/careers/${id}/toggle`, { method: 'PUT' });
@@ -138,17 +157,20 @@ const ManageCareers = () => {
     }
   };
 
-  const handleSave = async (formData) => {
+  const handleSave = async (formData, id=null) => {
     try {
       setSaving(true);
-      const res = await fetch(`${API_BASE}/careers`, {
-        method: 'POST',
+      const url = id ? `${API_BASE}/careers/${id}` : `${API_BASE}/careers`;
+      const method = id ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
       if (!res.ok) throw new Error('Failed to save');
       await fetchOpenings();
       setShowAddModal(false);
+      setEditingOpening(null);
     } catch (err) {
       alert(err.message);
     } finally {
@@ -168,7 +190,7 @@ const ManageCareers = () => {
       <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold">Manage Job Openings</h1>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => { setEditingOpening(null); setShowAddModal(true); }}
           className="flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700"
         >
           <PlusCircle className="w-5 h-5" /> Add Opening
@@ -178,6 +200,7 @@ const ManageCareers = () => {
       {showAddModal && (
         <AddOpeningModal
           onClose={() => setShowAddModal(false)}
+          opening={editingOpening}
           onSave={handleSave}
           isSaving={saving}
         />
@@ -211,20 +234,14 @@ const ManageCareers = () => {
                   )}
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <button
-                    onClick={() => handleToggle(o._id)}
-                    className="text-amber-600 hover:text-amber-900"
-                    title="Toggle Open/Closed"
-                  >
-                    {o.isOpen ? <ToggleRight className="w-6 h-6" /> : <ToggleLeft className="w-6 h-6" />}
-                  </button>
+                  <button onClick={() => handleEdit(o)} className="text-blue-600 hover:text-blue-900 mr-2" title="Edit"><Edit className="w-5 h-5"/></button>
+                  <button onClick={() => handleDelete(o._id)} className="text-red-600 hover:text-red-900 mr-2" title="Delete"><Trash2 className="w-5 h-5"/></button>
+                  <button onClick={() => handleToggle(o._id)} className="text-amber-600 hover:text-amber-900" title="Toggle Open/Closed">{o.isOpen ? <ToggleRight className="w-6 h-6"/> : <ToggleLeft className="w-6 h-6"/>}</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-
-        {/* Mobile Card View */}
         <div className="divide-y divide-gray-200 md:hidden">
           {openings.map((o) => (
             <div key={o._id} className="p-4">
@@ -254,6 +271,9 @@ const ManageCareers = () => {
                 <span className="text-gray-500">|</span>
                 <span className="font-medium">Location:</span>
                 <span>{o.location || '-'}</span>
+                <button onClick={() => handleEdit(o)} className="text-blue-600 hover:text-blue-900 ml-auto" title="Edit"><Edit className="w-5 h-5"/></button>
+                <button onClick={() => handleDelete(o._id)} className="text-red-600 hover:text-red-900 ml-2" title="Delete"><Trash2 className="w-5 h-5"/></button>
+                <button onClick={() => handleToggle(o._id)} className="text-amber-600 hover:text-amber-900 ml-2" title="Toggle Open/Closed">{o.isOpen ? <ToggleRight className="w-6 h-6"/> : <ToggleLeft className="w-6 h-6"/>}</button>
               </div>
             </div>
           ))}
