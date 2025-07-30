@@ -87,14 +87,31 @@ const EventForm = ({ event, onSave, onCancel, isSaving }) => {
       const compressed = await compressImage(files[0]);
       setMainImageFile(compressed);
     } else {
-      const compressedFiles = await Promise.all(
-        Array.from(files).map((file) => compressImage(file))
-      );
-      setGalleryImageFiles(compressedFiles);
+      setIsCompressing(true);
+      try {
+        const compressedFiles = await Promise.all(
+          Array.from(files).map(async (file, idx) => {
+            const compressedFile = await compressImage(file);
+            const extension = file.name.split('.').pop();
+            // Create a new File object with a unique name
+            return new File([compressedFile], `gallery-${Date.now()}-${idx}.${extension}`, { type: compressedFile.type });
+          })
+        );
+        setGalleryImageFiles(compressedFiles);
+      } catch (error) {
+        console.error('Error during image compression:', error);
+        // toast.error('Failed to compress gallery images.');
+      } finally {
+        setIsCompressing(false);
+      }
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    if (isCompressing) {
+      // toast.info('Please wait for images to finish compressing.');
+      return;
+    }
     e.preventDefault();
     const submissionData = new FormData();
 
@@ -157,7 +174,7 @@ const EventForm = ({ event, onSave, onCancel, isSaving }) => {
 
           <div className="flex justify-end space-x-4 pt-4">
             <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
-            <button type="submit" disabled={isSaving} className="px-4 py-2 rounded text-white bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 flex items-center justify-center">
+            <button type="submit" disabled={isSaving || isCompressing} className="px-4 py-2 rounded text-white bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 flex items-center justify-center">
               {isSaving ? (
                 <>
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -182,6 +199,7 @@ const ManageEvents = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
 
   const fetchEvents = async () => {
     try {

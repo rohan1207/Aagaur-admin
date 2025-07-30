@@ -66,6 +66,7 @@ const AddProject = () => {
   const [galleryImages, setGalleryImages] = useState([]);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState('success');
 
@@ -151,6 +152,10 @@ const AddProject = () => {
   };
 
   const handleSubmit = async (e) => {
+    if (isCompressing) {
+      toast.info('Please wait for images to finish compressing.');
+      return;
+    }
     e.preventDefault();
     if (!validateForm()) {
       showSweetAlert('error','Please fill in all required fields before submitting.');
@@ -215,8 +220,6 @@ const AddProject = () => {
       showSweetAlert('success', 'Project added successfully!');
       setForm(initialFormState);
       setMainImage(null);
-  // reset galleryImages too
-  setGalleryImages([]);
       setGalleryImages([]);
     } catch (err) {
       clearTimeout(timeoutId);
@@ -356,7 +359,22 @@ const AddProject = () => {
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">Gallery Images</label>
                   <div className="relative">
-                    <input type="file" multiple accept="image/*" onChange={async (e)=>{ const files=Array.from(e.target.files||[]); if(!files.length) return; const compressed=await Promise.all(files.map(f=>compressImage(f))); setGalleryImages(compressed); }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                    <input type="file" multiple accept="image/*" onChange={async (e)=>{ const files=Array.from(e.target.files||[]); if(!files.length) return; setIsCompressing(true);
+      try {
+        const compressedFiles = await Promise.all(
+          Array.from(files).map(async (file, idx) => {
+            const compressedFile = await compressImage(file);
+            const extension = file.name.split('.').pop();
+            return new File([compressedFile], `gallery-${Date.now()}-${idx}.${extension}`, { type: compressedFile.type });
+          })
+        );
+        setGalleryImages(compressedFiles);
+      } catch (error) {
+        console.error('Error during image compression:', error);
+        toast.error('Failed to compress gallery images.');
+      } finally {
+        setIsCompressing(false);
+      } }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                     <div className="flex items-center justify-center w-full h-24 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50 hover:bg-slate-100">
                       <div className="text-center">
                         <Upload className="mx-auto h-8 w-8 text-slate-400 mb-2" />
@@ -368,8 +386,8 @@ const AddProject = () => {
               </div>
 
               <div className="pt-4">
-                <button type="submit" disabled={isLoading} className={`w-full py-4 px-6 rounded-lg font-medium text-white transition-all duration-200 transform ${
-                  isLoading
+                <button type="submit" disabled={isLoading || isCompressing} className={`w-full py-4 px-6 rounded-lg font-medium text-white transition-all duration-200 transform ${
+                  isLoading || isCompressing
                     ? 'bg-slate-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl'
                 }`}>

@@ -97,7 +97,11 @@ const ProjectFormModal = ({ project, onSave, onCancel, isLoading }) => {
     setForm(prev => ({ ...prev, [field]: newList }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    if (isCompressing) {
+      // toast.info('Please wait for images to finish compressing.');
+      return;
+    }
     e.preventDefault();
     const formData = new FormData();
 
@@ -182,16 +186,30 @@ const ProjectFormModal = ({ project, onSave, onCancel, isLoading }) => {
             <input type="file" multiple onChange={async (e) => {
                 const files = Array.from(e.target.files || []);
                 if (!files.length) return;
-                const compressedArr = await Promise.all(files.map(f=>compressImage(f)));
-                setGalleryImages(compressedArr);
+                setIsCompressing(true);
+                try {
+                  const compressedFiles = await Promise.all(
+                    Array.from(files).map(async (file, idx) => {
+                      const compressedFile = await compressImage(file);
+                      const extension = file.name.split('.').pop();
+                      return new File([compressedFile], `gallery-${Date.now()}-${idx}.${extension}`, { type: compressedFile.type });
+                    })
+                  );
+                  setGalleryImages(compressedFiles);
+                } catch (error) {
+                  console.error('Error during image compression:', error);
+                  // toast.error('Failed to compress gallery images.');
+                } finally {
+                  setIsCompressing(false);
+                }
              }} className="w-full p-3 border rounded" />
             <div className="flex flex-wrap gap-2 mt-2">{project.galleryImages && project.galleryImages.map(img => <img key={img} src={img} alt="Gallery" className="w-20 h-20 object-cover"/>)}</div>
           </div>
 
           <div className="flex justify-end space-x-4 pt-4">
             <button type="button" onClick={onCancel} className="px-6 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
-            <button type="submit" disabled={isLoading} className="px-6 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 flex items-center">
-              {isLoading && <Loader2 className="w-5 h-5 animate-spin mr-2" />} Save Changes
+            <button type="submit" disabled={isLoading || isCompressing} className="px-6 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 flex items-center">
+              {(isLoading || isCompressing) && <Loader2 className="w-5 h-5 animate-spin mr-2" />} {isLoading || isCompressing ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>
@@ -203,7 +221,8 @@ const ProjectFormModal = ({ project, onSave, onCancel, isLoading }) => {
 
 const ManageProject = () => {
   const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
