@@ -3,8 +3,9 @@ export const API_BASE = import.meta.env.VITE_API_URL;
 
 export const apiFetch = async (endpoint, options = {}) => {
   const token = localStorage.getItem('adminToken');
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const headers = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };

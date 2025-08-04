@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiFetch } from '../utils/api';
+import { compressImage } from '../utils/compressImage';
 
 // SVG Icon Components
 const ProjectIcon = () => (
@@ -50,6 +51,111 @@ const StatItem = ({ label, value, to, icon }) => (
   </Link>
 );
 
+const HeroImageManager = () => {
+  const [heroImage, setHeroImage] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    const fetchHeroImage = async () => {
+      try {
+        const data = await apiFetch('/hero-image');
+        setHeroImage(data.imageUrl);
+      } catch (err) {
+        console.log('No hero image found, which is okay.');
+      }
+    };
+    fetchHeroImage();
+  }, []);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreview(URL.createObjectURL(file));
+      setError('');
+      setSuccess('');
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setError('Please select an image first.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+        try {
+      const compressedFile = await compressImage(selectedFile);
+      
+      const formData = new FormData();
+      formData.append('image', compressedFile, compressedFile.name);
+
+      const updatedImage = await apiFetch('/hero-image', {
+        method: 'PUT',
+        body: formData,
+      });
+
+      setHeroImage(updatedImage.imageUrl);
+      setSuccess('Hero image updated successfully!');
+      setSelectedFile(null);
+      setPreview(null);
+    } catch (err) {
+      setError(err.message || 'Failed to update hero image.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-800 dark:text-white">Manage Home Page Hero Image</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Current Hero Image</h3>
+            {heroImage ? (
+              <img src={heroImage} alt="Current Hero" className="w-full h-auto rounded-lg shadow" />
+            ) : (
+              <p className="text-gray-500">No hero image set.</p>
+            )}
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Upload New Image</h3>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleFileChange}
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+            {preview && (
+              <div className="mt-4">
+                <p className="font-semibold mb-2">New Image Preview:</p>
+                <img src={preview} alt="New hero preview" className="w-full h-auto rounded-lg shadow" />
+              </div>
+            )}
+            <button
+              onClick={handleUpload}
+              disabled={loading || !selectedFile}
+              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Uploading...' : 'Update Image'}
+            </button>
+            {error && <p className="text-red-500 mt-2">{error}</p>}
+            {success && <p className="text-green-500 mt-2">{success}</p>}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
@@ -84,7 +190,7 @@ const Dashboard = () => {
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto mt-10">
       <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800 dark:text-white">Dashboard</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <StatItem 
           label="Projects" 
           value={stats.projects} 
@@ -117,6 +223,7 @@ const Dashboard = () => {
           icon={<TeamIcon />}
         />
       </div>
+      <HeroImageManager />
     </div>
   );
 };
